@@ -1,0 +1,39 @@
+name: autoscale-2-10-group
+service_account_id: ajev1uch48hpm0djr3s3 # Requires compute.editor role
+description: "Auto-scaling group (min 2, max 10, start 4, CPU target 80%)"
+
+allocation_policy:
+  zones:
+    - ru-central1-a
+    - ru-central1-b
+
+scale_policy:
+  auto_scale:
+    auto_scale_type: REGIONAL # Scale the group as a whole based on regional metrics
+    initial_size: 4          # Start with 4 VMs
+    max_size: 10             # Upper limit
+    min_zone_size: 1         # With 2 zones, this ensures a total minimum of 2 VMs
+    measurement_duration: 60s
+    warmup_duration: 60s
+    stabilization_duration: 120s # Prevents immediate scale-down after a spike
+    cpu_utilization_rule:
+      utilization_target: 80 # Target CPU utilization is 80%
+
+instance_template:
+  platform_id: standard-v3
+  resources_spec:
+    memory: 2g
+    cores: 2
+  boot_disk_spec:
+    mode: READ_WRITE
+    disk_spec:
+      image_id: fd85u7s36ukaumqt743m
+      type_id: network-hdd
+      size: 10g
+  network_interface_specs:
+    - subnet_ids:
+        - e9b2j63tq55iak0gvupi   # ig-subnet-a, ru-central1-a
+        - fl8339d3u81fdpqmoum2   # ig-subnet-d, ru-central1-d
+        - ajcraff75uerjksa87ff   # ig-subnet-e, ru-central1-e
+      primary_v4_address_spec: {}
+

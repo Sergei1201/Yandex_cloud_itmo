@@ -1,0 +1,17 @@
+# Create a group an autoscaling group from a YAML file
+yc compute instance-group create --file scaling_group.yaml
+
+#Load CPU to 100% according to the task instructions and watch scaling (spawn 2 CPU workers)
+stress -c 2 &
+
+# Observe Scale-Up to 4 according to the task instructions
+yc compute instance-group list
+
+# Observe Scale-Down to 3 according to the task instructions
+pkill stress
+
+# Delete the instance group according to the task instructions
+yc compute instance-group delete --name autoscale-2-10-group
+
+
+
